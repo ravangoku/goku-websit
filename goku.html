@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>goku</title>
+  <link rel="icon" type="image/png" href="goku-symbol-seeklogo.png">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+
+        overflow: hidden; /* Hide scrollbars */
+    }
+
+    #background-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -1; /* Behind other content */
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    body { font-family: sans-serif; }
+    .container { width: 300px; margin: 20px auto; }
+    .form-group { margin-bottom: 10px; }
+    label { display: block; }
+    input { width: 100%; padding: 5px; }
+    button { padding: 10px 15px; background-color: #0edd0e; color: rgb(238, 18, 18); border: none; cursor: pointer; }
+    .error-message { color: red; }
+    .success-message { color: green; }
+    .hidden { display: none; } 
+  </style>
+</head>
+<body>
+  
+  <video id="background-video" autoplay loop muted playsinline>
+    <source src="SSJ 2 Goku vs Majin Vegeta - 4k 60fps.mp4" type="video/mp4">
+    Your browser does not support HTML5 video.
+  </video>
+
+  <div class="container">
+    <h2 id="login-heading">Login</h2>
+    <form id="login-form">
+      <div class="form-group">
+        <label for="login-email">Email:</label>
+        <input type="email" id="login-email" name="login-email" required>
+      </div>
+      <div class="form-group">
+        <label for="login-password">Password:</label>
+        <input type="password" id="login-password" name="login-password" required>
+      </div>
+      <div class="form-group">
+        <button >
+          <a href=""> Login</a>
+        </button>
+      </div>
+      <div class="error-message" id="login-error"></div>
+      <p id="register-link">Need an account? <a href="#">Register</a></p>
+    </form>
+
+    <h2 id="register-heading" class="hidden">Register</h2>
+    <form id="register-form" class="hidden">
+      <div class="form-group">
+        <label for="register-email">Email:</label>
+        <input type="email" id="register-email" name="register-email" required>
+      </div>
+      <div class="form-group">
+        <label for="register-password">Password:</label>
+        <input type="password" id="register-password" name="register-password" required>
+      </div>
+        <div class="form-group">
+        <label for="confirm-password">Confirm Password:</label>
+        <input type="password" id="confirm-password" name="confirm-password" required>
+      </div>
+      <div class="form-group">
+        <button type="submit">Register</button>
+      </div>
+      <div class="error-message" id="register-error"></div>
+      <div class="success-message" id="register-success"></div>
+       <p id="login-link">Already have an account? <a href="#">Login</a></p>
+    </form>
+
+  </div>
+
+  <script>
+    // Function to get users from local storage
+    function getUsers() {
+      const usersString = localStorage.getItem('users');
+      return usersString ? JSON.parse(usersString) : [];
+    }
+
+    // Function to save users to local storage
+    function saveUsers(users) {
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+
+    document.getElementById('register-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const email = document.getElementById('register-email').value;
+      const password = document.getElementById('register-password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+      const registerError = document.getElementById('register-error');
+      const registerSuccess = document.getElementById('register-success');
+
+      registerError.textContent = ''; // Clear previous errors
+      registerSuccess.textContent = '';
+
+      if (password !== confirmPassword) {
+        registerError.textContent = 'Passwords do not match.';
+        return;
+      }
+
+        // Basic email validation (check for @ symbol)
+      if (!email.includes('@')) {
+        registerError.textContent = 'Please enter a valid email address.';
+        return;
+      }
+
+      if (password.length < 6) {
+        registerError.textContent = 'Password must be at least 6 characters long.';
+        return;
+      }
+
+      // Check if the email already exists
+      const users = getUsers();
+      if (users.find(user => user.email === email)) {
+        registerError.textContent = 'Email already registered.';
+        return;
+      }
+
+      const newUser = { email: email, password: password }; // Store password as is (VERY INSECURE)
+      users.push(newUser);
+      saveUsers(users); // Save the updated user list
+
+      registerSuccess.textContent = 'Registration successful! Please log in.';
+      document.getElementById('register-form').classList.add('hidden');
+      document.getElementById('login-form').classList.remove('hidden');
+       document.getElementById('register-heading').classList.add('hidden');
+            document.getElementById('login-heading').classList.remove('hidden');
+
+      document.getElementById('register-email').value = ''; // Clear the form
+      document.getElementById('register-password').value = '';
+      document.getElementById('confirm-password').value = '';
+    });
+
+     document.getElementById('login-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const loginError = document.getElementById('login-error');
+
+      loginError.textContent = '';
+
+      const users = getUsers();
+      const user = users.find(user => user.email === email && user.password === password); // Check password as is (VERY INSECURE)
+
+      if (user) {
+        alert('Login successful!'); // Replace with redirection or UI update
+      } else {
+        loginError.textContent = 'Invalid email or password.';
+      }
+    });
+
+    // Show register form
+    document.getElementById('register-link').addEventListener('click', function(event) {
+        event.preventDefault();
+        document.getElementById('login-form').classList.add('hidden');
+        document.getElementById('register-form').classList.remove('hidden');
+        document.getElementById('login-heading').classList.add('hidden');
+        document.getElementById('register-heading').classList.remove('hidden');
+    });
+
+    // Show login form
+      document.getElementById('login-link').addEventListener('click', function(event) {
+        event.preventDefault();
+        document.getElementById('register-form').classList.add('hidden');
+        document.getElementById('login-form').classList.remove('hidden');
+        document.getElementById('register-heading').classList.add('hidden');
+        document.getElementById('login-heading').classList.remove('hidden');
+    });
+  </script>
+
+</body>
+
+</html>
